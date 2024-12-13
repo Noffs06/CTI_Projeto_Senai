@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1  # Versão da API para o Cert-Manager (gerenciador de certificados)
+kind: Certificate  # Tipo de recurso (Certificate, usado para solicitar e gerenciar certificados)
+metadata:
+  name: kubecert  # Nome do recurso de certificado
+  namespace: default  # Namespace onde o certificado será gerado (geralmente 'default')
+spec:
+  secretName: default  # Nome do segredo onde o certificado será armazenado
+  issuerRef:
+    name: kubeissuer  # Nome do issuer (emissor do certificado) que será utilizado para gerar o certificado
+    kind: ClusterIssuer  # Tipo de issuer (ClusterIssuer é um recurso global no cluster)
+  commonName: az.mesa1.ctiturbo.com.br  # Nome comum (Common Name) do certificado, normalmente o domínio principal
+  dnsNames:
+  - az.mesa1.ctiturbo.com.br  # Lista de DNS Names que o certificado deve cobrir (domínios adicionais)

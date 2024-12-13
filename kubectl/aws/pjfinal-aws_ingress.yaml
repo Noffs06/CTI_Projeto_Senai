@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1  # Versão da API para Ingress
+kind: Ingress  # Tipo de recurso (Ingress, utilizado para expor serviços HTTP)
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: kubeissuer  # Referência ao ClusterIssuer para gerar o certificado SSL
+    kubernetes.io/ingress.class: nginx  # Classe do Ingress, neste caso, usando o controlador de Ingress do NGINX
+  name: "webserver-ingress"  # Nome do recurso Ingress
+  namespace: default  # Namespace onde o Ingress será criado (default)
+spec:
+  rules:  # Regras de roteamento para os hosts
+  - host: www.mesa1.ctiturbo.com.br  # O domínio para o qual a regra se aplica
+    http:
+      paths:
+      - backend:  # Configuração do serviço backend para o Ingress
+          service:
+            name: "webserver-service"  # Nome do serviço que será exposto
+            port:
+              number: 80  # Porta onde o serviço estará ouvindo
+        path: /  # Caminho que será roteado
+        pathType: Prefix  # Tipo do caminho (Prefix indica que qualquer subcaminho será roteado para o backend)
+  - host: aws.mesa1.ctiturbo.com.br  # Outro domínio para o qual a regra se aplica
+    http:
+      paths:
+      - backend:  # Configuração do serviço backend para o Ingress
+          service:
+            name: "webserver-service"  # Nome do serviço que será exposto
+            port:
+              number: 80  # Porta onde o serviço estará ouvindo
+        path: /  # Caminho que será roteado
+        pathType: Prefix  # Tipo do caminho (Prefix indica que qualquer subcaminho será roteado para o backend)
+  tls:  # Configuração de TLS para segurança da comunicação
+  - hosts:
+    - www.mesa1.ctiturbo.com.br  # Domínios que serão protegidos com SSL
+    - aws.mesa1.ctiturbo.com.br  # Domínios que serão protegidos com SSL
+    secretName: default  # Nome do Secret que contém o certificado TLS gerado pelo Cert-Manager

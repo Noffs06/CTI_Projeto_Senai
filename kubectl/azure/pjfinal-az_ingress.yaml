@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1  # Versão da API para ingressos de rede no Kubernetes
+kind: Ingress  # Tipo de recurso, Ingress é usado para gerenciar o tráfego HTTP/HTTPS para os serviços
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: kubeissuer  # Referência ao issuer (emissor de certificado) utilizado para gerar o certificado TLS
+    kubernetes.io/ingress.class: nginx  # Define qual controlador de ingress será utilizado (neste caso, o controlador NGINX)
+  name: "webserver-ingress"  # Nome do recurso de Ingress
+  namespace: default  # Namespace onde o recurso Ingress será criado
+spec:
+  rules:
+  - host: az.mesa1.ctiturbo.com.br  # O domínio que será roteado pelo Ingress
+    http:
+      paths:
+      - backend:
+          service:
+            name: "webserver-service"  # Nome do serviço que será exposto pelo Ingress
+            port:
+              number: 80  # Porta do serviço que será acessada pelo Ingress
+        path: /  # Caminho para rotear as requisições
+        pathType: Prefix  # Tipo de correspondência do caminho, Prefix indica que todos os caminhos que começam com '/' serão roteados
+  tls:
+  - hosts:
+    - az.mesa1.ctiturbo.com.br  # O domínio que utilizará TLS
+    secretName: default  # Nome do segredo que contém o certificado TLS para este domínio

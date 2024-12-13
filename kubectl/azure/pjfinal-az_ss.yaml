@@ -1,0 +1,35 @@
+apiVersion: apps/v1  # Versão da API do Kubernetes para gerenciar recursos do tipo StatefulSet
+kind: StatefulSet  # Tipo de recurso, StatefulSet é utilizado para manter o estado dos pods, especialmente para aplicações que exigem persistência
+metadata:
+  name: azure-pod  # Nome do StatefulSet
+  namespace: default  # Namespace onde o StatefulSet será criado
+spec:
+  serviceName: "webserver-service"  # Nome do serviço associado ao StatefulSet, utilizado para roteamento de tráfego
+  replicas: 2  # Define o número de réplicas do pod que devem ser criadas
+  selector:
+    matchLabels:
+      app: "webserver"  # A correspondência de labels para identificar os pods gerenciados por este StatefulSet
+  template:
+    metadata:
+      labels:
+        app: "webserver"  # Labels para os pods criados, utilizado para fazer referência ao serviço e facilitar a organização
+    spec:
+      containers:
+      - name: webserver  # Nome do primeiro contêiner
+        image: tlhsenai/siteprojhttp:latest  # Imagem Docker do site que será executada no contêiner
+        ports:
+        - containerPort: 80  # A porta do contêiner que será exposta
+        env:
+        - name: PORT  # Variável de ambiente que define a porta do contêiner
+          value: "80"  # Valor da variável PORT que será usado no contêiner
+      - name: zabbix-agent  # Nome do segundo contêiner, o agente Zabbix
+        image: zabbix/zabbix-agent:latest  # Imagem Docker do Zabbix Agent
+        env:
+        - name: ZBX_SERVER_HOST  # Variável de ambiente que define o endereço IP do servidor Zabbix
+          value: "192.168.1.58"  # IP privado do servidor Zabbix
+        - name: ZBX_HOSTNAME  # Nome do host que será usado pelo Zabbix para identificar o agente
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name  # Usa o nome do pod como hostname
+        ports:
+        - containerPort: 10050  # A porta do agente Zabbix que será exposta para monitoramento

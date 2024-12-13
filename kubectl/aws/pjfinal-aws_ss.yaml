@@ -1,0 +1,35 @@
+apiVersion: apps/v1  # Versão da API para StatefulSet (usado para pods com identidade persistente)
+kind: StatefulSet  # Tipo de recurso (StatefulSet para gerenciar pods com identidade e armazenamento estável)
+metadata:
+  name: aws-pod  # Nome do StatefulSet
+  namespace: default  # Namespace onde o StatefulSet será criado
+spec:
+  serviceName: "webserver-service"  # Nome do serviço que vai expor os pods
+  replicas: 2  # Número de réplicas (número de pods que serão criados)
+  selector:
+    matchLabels:
+      app: "webserver"  # Label para selecionar os pods que fazem parte deste StatefulSet
+  template:
+    metadata:
+      labels:
+        app: "webserver"  # Label para os pods criados por este StatefulSet
+    spec:
+      containers:  # Definição dos containers que estarão nos pods
+      - name: webserver  # Nome do container
+        image: tlhsenai/siteprojhttp:latest  # Imagem Docker do site (certifique-se de que esta imagem esteja disponível)
+        ports:
+        - containerPort: 80  # Porta que o container escuta (porta HTTP)
+        env:
+        - name: PORT  # Variável de ambiente para o container webserver
+          value: "80"  # Porta que o servidor web deve usar
+      - name: zabbix-agent  # Nome do container Zabbix Agent
+        image: zabbix/zabbix-agent:latest  # Imagem Docker do Zabbix Agent
+        env:
+        - name: ZBX_SERVER_HOST  # Variável de ambiente para o host do servidor Zabbix
+          value: "192.168.1.58"  # Endereço IP privado do servidor Zabbix
+        - name: ZBX_HOSTNAME  # Nome do host do agente Zabbix
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name  # Nome do pod será utilizado como o hostname do agente
+        ports:
+        - containerPort: 10050  # Porta onde o Zabbix Agent escuta (porta padrão do Zabbix Agent)

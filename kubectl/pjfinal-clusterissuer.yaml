@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1  # A versão da API do cert-manager usada para gerenciar certificados
+kind: ClusterIssuer  # Tipo de recurso para um ClusterIssuer, que é responsável por emitir certificados no nível de cluster
+metadata:
+  name: kubeissuer  # Nome do ClusterIssuer, será usado para referenciar este recurso em outras configurações
+  namespace: default  # Namespace onde o ClusterIssuer está localizado (geralmente no namespace padrão)
+spec:
+  acme:  # Especifica a configuração do ACME (Automatic Certificate Management Environment) para emissão de certificados
+    server: https://acme-v02.api.letsencrypt.org/directory  # URL do servidor ACME, no caso, Let's Encrypt
+    email: default@default.com  # O email usado para o registro no ACME, necessário para notificações e validações
+    privateKeySecretRef:
+      name: kubeissuer  # Nome do segredo onde a chave privada da conta ACME será armazenada, usada para autenticação e assinatura
+    solvers:
+    - http01:  # Descreve o método de validação HTTP-01 para o desafio ACME
+        ingress:  # O solver HTTP-01 usará um recurso Ingress para responder aos desafios
+          class: nginx  # A classe de ingress que o cert-manager deve usar, geralmente configurada para o controlador de ingress NGINX

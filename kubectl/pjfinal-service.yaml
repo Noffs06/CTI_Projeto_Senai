@@ -1,0 +1,14 @@
+apiVersion: v1  # A versão da API do Kubernetes para recursos básicos como Services
+kind: Service  # O tipo de recurso, nesse caso, um Service, usado para expor aplicações no cluster
+metadata:
+  name: "webserver-service"  # O nome do Service, usado para referenciar o serviço dentro do Kubernetes
+  namespace: default  # O namespace onde o Service será criado (padrão é 'default')
+spec:
+  selector:
+    app: "webserver"  # O seletor que determina quais pods serão expostos por este Service. O Service irá expor os pods com o label "app: webserver"
+  ports:
+  - name: http  # O nome da porta, que pode ser referenciado por outros recursos
+    port: 80  # A porta no Service para acesso externo dentro do cluster
+    protocol: TCP  # O protocolo usado para comunicação (neste caso, TCP)
+    targetPort: 80  # A porta nos pods para onde o tráfego será encaminhado (os pods devem expor a porta 80)
+  type: NodePort  # O tipo do Service. NodePort expõe o serviço em todas as máquinas do cluster em uma porta específica
